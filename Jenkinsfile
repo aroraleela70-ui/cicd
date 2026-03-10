@@ -12,7 +12,7 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 sh '''
-                cp $WORKSPACE/index.html /home/ubuntu/projects/index.html
+                scp -i /home/ubuntu/deploy.pem index.html ubuntu@15.206.163.142:/home/ubuntu/projects/index.html
                 sudo systemctl reload nginx
                 '''
             }
