@@ -12,8 +12,8 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 sh '''
-                scp -i /var/lib/jenkins/deploy.pem /var/lib/jenkins/workspace/demo/index.html ubuntu@15.206.163.142:/home/ubuntu/projects/index.html
-                sudo systemctl reload nginx
+                scp -i /var/lib/jenkins/deploy.pem $WORKSPACE/index.html ubuntu@15.206.163.142:/home/ubuntu/projects/index.html
+                ssh -i /var/lib/jenkins/deploy.pem ubuntu@15.206.163.142 "sudo systemctl reload nginx"
                 '''
             }
         }
