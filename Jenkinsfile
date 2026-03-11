@@ -1,20 +1,30 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+        S3_BUCKET = 's3-demo34'
+    }
+
     stages {
 
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/aroraleela70-ui/cicd.git'
+                git branch: 'develop', url: 'https://github.com/aroraleela70-ui/cicd.git'
             }
         }
 
-        stage('Deploy to Server') {
+        stage('Deploy to S3') {
             steps {
-                sh '''
-                scp -i /var/lib/jenkins/deploy.pem $WORKSPACE/index.html ubuntu@15.206.163.142:/home/ubuntu/projects/index.html
-                ssh -i /var/lib/jenkins/deploy.pem ubuntu@15.206.163.142 "sudo systemctl reload nginx"
-                '''
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-jenkins-creds'
+                ]]) {
+
+                    sh '''
+                    aws s3 sync . s3://$S3_BUCKET --delete
+                    '''
+                }
             }
         }
 
